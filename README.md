@@ -278,8 +278,3 @@ node run_sample.js
 
 This prints outputs for all six phases in terminal.
 
-## 10) Notes
-
-- The target code is pseudo assembly for educational demonstration.
-- The parse tree is textual; AST JSON is also shown.
-- This is designed to be self-contained and open-source friendly.
