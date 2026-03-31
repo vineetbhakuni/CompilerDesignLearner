@@ -14,6 +14,7 @@ const {
 } = require("./pipeline");
 
 const backendDir = __dirname;
+const projectRoot = path.join(backendDir, "..");
 const app = express();
 
 const OPERATIONS = new Map([
@@ -108,7 +109,7 @@ function displayTokenType(type) {
 }
 
 app.get("/", (_req, res) => {
-  res.sendFile(path.join(backendDir, "templates", "dashboard.html"));
+  res.sendFile(path.join(projectRoot, "index.html"));
 });
 
 app.get("/operation/:name", (req, res) => {
@@ -117,7 +118,11 @@ app.get("/operation/:name", (req, res) => {
     res.status(404).send("Operation not found");
     return;
   }
-  res.sendFile(path.join(backendDir, "templates", "operation.html"));
+  res.redirect(`/operations.html?op=${name}`);
+});
+
+app.get("/operations.html", (_req, res) => {
+  res.sendFile(path.join(projectRoot, "operations.html"));
 });
 
 app.get("/api/operations", (_req, res) => {

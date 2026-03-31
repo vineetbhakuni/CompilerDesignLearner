@@ -28,7 +28,9 @@ dikhao(pi);
 dikhao("done");`;
 
 const tabOrder = ["compiler", "lexer", "parser", "semantic", "intermediate", "codegen"];
-const opKey = (window.location.pathname.split("/").pop() || "compiler").toLowerCase();
+const opQuery = new URLSearchParams(window.location.search).get("op");
+const opFromPath = window.location.pathname.split("/").pop();
+const opKey = (opQuery || opFromPath || "compiler").toLowerCase();
 const current = OP_META[opKey] || OP_META.compiler;
 
 const opTitle = document.getElementById("opTitle");
@@ -43,7 +45,7 @@ function makeTabs() {
   tabs.innerHTML = "";
   for (const key of tabOrder) {
     const a = document.createElement("a");
-    a.href = `/operation/${key}`;
+    a.href = `/operations.html?op=${key}`;
     a.textContent = OP_META[key].title;
     a.className = `tab-link ${key === opKey ? "active" : ""}`;
     tabs.appendChild(a);
