@@ -1,0 +1,18 @@
+rakho int x = 5;
+rakho int y = 10;
+rakho int z;
+rakho bool flag = sahi;
+
+agar (x < y and flag) {
+    z = x + y;
+    dikhao(z);
+} warna {
+    z = y - x;
+    dikhao(z);
+}
+
+jabtak (z < 20) {
+    z = z + 1;
+}
+
+dikhao("done");

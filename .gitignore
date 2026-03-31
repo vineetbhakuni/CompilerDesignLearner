@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+backend/.venv/
+compiler/parser
+compiler/lexer_tokens
+compiler/*.yy.c
+compiler/*.tab.c
+compiler/*.tab.h
+
+backend/node_modules/
+backend/*.tmp
+backend/*.log
+

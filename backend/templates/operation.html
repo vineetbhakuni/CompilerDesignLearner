@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>Hinglish Compiler Operation</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero compact">
+        <a class="home-link" href="/">Dashboard</a>
+        <h1 id="opTitle">Operation</h1>
+      </header>
+
+      <section class="panel">
+        <div id="operationTabs" class="tabs"></div>
+        <div class="action-row">
+          <button id="runBtn" type="button">Run</button>
+          <span id="statusText" class="status-text"></span>
+        </div>
+
+        <div class="workspace-grid">
+          <section class="pane">
+            <div id="editor" class="editor-box"></div>
+          </section>
+          <section class="pane">
+            <div id="outputRoot" class="output-box"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      window.mgt = window.mgt || {};
+      if (typeof window.mgt.clearMarks !== "function") {
+        window.mgt.clearMarks = function () {};
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0/min/vs/loader.js?v=20260331"></script>
+    <script src="/static/operation.js?v=20260331"></script>
+  </body>
+</html>

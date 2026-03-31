@@ -1,0 +1,13 @@
+{
+  "name": "hinglish-lang-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Node.js backend for Hinglish-lang web compiler",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
