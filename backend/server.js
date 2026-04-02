@@ -2,15 +2,10 @@ const path = require("node:path");
 const express = require("express");
 
 const {
-  SemanticAnalyzer,
-  generateIR,
-  optimizeIR,
-  renderIR,
-  generateTargetCode,
   parseSource,
   lexSource,
   buildParseTreeData,
-  executeIR,
+  executeAst,
 } = require("./pipeline");
 
 const backendDir = __dirname;
@@ -21,9 +16,6 @@ const OPERATIONS = new Map([
   ["compiler", "Hinglish Compiler"],
   ["lexer", "Lexical Analyzer"],
   ["parser", "Parse Tree Generator"],
-  ["semantic", "Symbol Table"],
-  ["intermediate", "Intermediate Code"],
-  ["codegen", "Code Generation"],
 ]);
 
 app.use(express.json({ limit: "1mb" }));
@@ -50,21 +42,10 @@ function getSource(req) {
 
 function compileCore(source) {
   const parsed = parseSource(source);
-  const analyzer = new SemanticAnalyzer();
-  const sem = analyzer.analyze(parsed.ast);
-
-  const ir = generateIR(parsed.ast);
-  const optimized = optimizeIR(ir);
-  const codegen = generateTargetCode(optimized);
-  const runtimeLines = executeIR(ir);
-
+  const runtime = executeAst(parsed.ast);
   return {
     parsed,
-    sem,
-    ir,
-    optimized,
-    codegen,
-    runtimeLines,
+    runtimeLines: runtime.output,
   };
 }
 
@@ -135,16 +116,6 @@ app.post("/api/compiler", (req, res) => {
   try {
     const source = getSource(req);
     const result = compileCore(source);
-
-    if (result.sem.errors.length > 0) {
-      res.json({
-        ok: false,
-        error: "Semantic errors detected.",
-        semanticErrors: result.sem.errors,
-      });
-      return;
-    }
-
     res.json({
       ok: true,
       output: result.runtimeLines.join("\n"),
@@ -176,49 +147,7 @@ app.post("/api/parser", (req, res) => {
   }
 });
 
-app.post("/api/semantic", (req, res) => {
-  try {
-    const source = getSource(req);
-    const { ast } = parseSource(source);
-    const analyzer = new SemanticAnalyzer();
-    const sem = analyzer.analyze(ast);
-    res.json({
-      ok: sem.errors.length === 0,
-      symbols: sem.symbolTable,
-      errors: sem.errors,
-    });
-  } catch (err) {
-    res.status(400).json({ ok: false, error: err instanceof Error ? err.message : String(err) });
-  }
-});
 
-app.post("/api/intermediate", (req, res) => {
-  try {
-    const source = getSource(req);
-    const result = compileCore(source);
-    if (result.sem.errors.length > 0) {
-      res.status(400).json({ ok: false, error: "Semantic errors detected.", details: result.sem.errors });
-      return;
-    }
-    res.json({ ok: true, ir: renderIR(result.ir), optimized: renderIR(result.optimized) });
-  } catch (err) {
-    res.status(400).json({ ok: false, error: err instanceof Error ? err.message : String(err) });
-  }
-});
-
-app.post("/api/codegen", (req, res) => {
-  try {
-    const source = getSource(req);
-    const result = compileCore(source);
-    if (result.sem.errors.length > 0) {
-      res.status(400).json({ ok: false, error: "Semantic errors detected.", details: result.sem.errors });
-      return;
-    }
-    res.json({ ok: true, code: result.codegen });
-  } catch (err) {
-    res.status(400).json({ ok: false, error: err instanceof Error ? err.message : String(err) });
-  }
-});
 
 const startPort = Number(process.env.PORT || 5000);
 

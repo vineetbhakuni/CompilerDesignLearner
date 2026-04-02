@@ -4,10 +4,7 @@ A complete web-based compiler pipeline for a custom C-like language with Hindi/E
 
 - Phase 1: Lexical Analysis (Flex)
 - Phase 2: Syntax Analysis + Parse Tree (Bison)
-- Phase 3: Semantic Analysis (JavaScript)
-- Phase 4: Intermediate Code Generation (JavaScript TAC)
-- Phase 5: Optimization (JavaScript constant folding + small cleanup)
-- Phase 6: Code Generation (JavaScript pseudo assembly)
+- The web app currently exposes the lexer, parser, and compiler views in the browser.
 
 ## 1) Hinglish-lang Language Specification
 
@@ -75,15 +72,11 @@ hinglish-lang-compiler/
     pipeline.js
     run_sample.js
     package.json
-    templates/
-      dashboard.html
-      operation.html
     static/
       style.css
       operation.js
   examples/
     sample.hgl
-    semantic_error.hgl
 ```
 
 ## 3) Prerequisites
@@ -134,9 +127,6 @@ Navigation:
 - `/operation/compiler` full compiler run with runtime output
 - `/operation/lexer` lexical analysis page
 - `/operation/parser` parse-tree drawing page
-- `/operation/semantic` symbol table page
-- `/operation/intermediate` intermediate code page
-- `/operation/codegen` target code generation page
 
 ## 5) Web Interface Behavior
 
@@ -144,7 +134,7 @@ Navigation:
 - Each operation page has its own Monaco editor and output panel
 - Lexical analysis shows table output (Line, Lexeme, Type)
 - Parse tree is rendered as a drawn tree (SVG), not AST JSON
-- Symbol table is rendered in a clean table UI
+- The compiler page returns runtime output from the internal pipeline
 
 ## 6) Compiler Pipeline Integration
 
@@ -152,13 +142,9 @@ Navigation:
   - `/api/compiler`
   - `/api/lexer`
   - `/api/parser`
-  - `/api/semantic`
-  - `/api/intermediate`
-  - `/api/codegen`
 2. JavaScript lexer/parser in `pipeline.js` parses source input
-3. Semantic analysis, IR, optimization, and code generation run in `pipeline.js`
-4. Compiler page executes IR and returns runtime program output
-5. Backend returns operation-specific output to the same page
+3. Compiler page executes the internal pipeline and returns runtime program output
+4. Backend returns operation-specific output to the same page
 
 ## 7) Example Program and Expected Outputs
 
@@ -188,84 +174,24 @@ Program
     ...
 ```
 
-### Phase 3 (Semantic sample)
+### Compiler Output
 
-```json
-{
-  "status": "OK",
-  "symbolTable": [
-    {"name":"x", "type":"int", "scope":"global"},
-    {"name":"y", "type":"int", "scope":"global"},
-    {"name":"z", "type":"int", "scope":"global"},
-    {"name":"flag", "type":"bool", "scope":"global"}
-  ],
-  "errors": []
-}
-```
+The browser compiler page runs the language through the internal pipeline and returns the program output.
 
-### Phase 4 (Three-address code sample)
+### Example Runtime Result
 
 ```text
-x = 5
-y = 10
-flag = true
-t1 = x < y
-t2 = t1 and flag
-ifFalse t2 goto ELSE1
-t3 = x + y
-z = t3
-print z
-goto ENDIF2
-ELSE1:
-t4 = y - x
-z = t4
-print z
-ENDIF2:
-WHILE3:
-t5 = z < 20
-ifFalse t5 goto ENDWH4
-t6 = z + 1
-z = t6
-goto WHILE3
-ENDWH4:
-print "done"
-```
-
-### Phase 5 (Optimization sample)
-
-```text
-x = 5
-y = 10
-flag = true
-...
-```
-
-### Phase 6 (Target code sample)
-
-```text
-MOV x, 5
-MOV y, 10
-MOV flag, true
-CMPLT t1, x, y
-AND t2, t1, flag
-JZ t2, ELSE1
-ADD t3, x, y
-MOV z, t3
-PRINT z
-...
+15
+done
 ```
 
 ## 8) Error Handling
 
 - Lexical errors: unknown characters with line number
 - Syntax errors: Bison parse errors with approximate line
-- Semantic errors:
-  - use before declaration
-  - redeclaration in same scope
-  - type mismatch in assignment/declaration
-  - invalid expression types
+- Internal validation still checks declarations and types before runtime output.
 
-Try `examples/semantic_error.hgl` to see semantic failure.
+
 
 ## 9) Quick CLI Validation
 
@@ -276,5 +202,4 @@ cd backend
 node run_sample.js
 ```
 
-This prints outputs for all six phases in terminal.
-
+This prints the lexer, parser, and compiler validation flow in terminal.

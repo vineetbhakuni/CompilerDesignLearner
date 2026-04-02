@@ -2,9 +2,6 @@ const OP_META = {
   compiler: { title: "Compiler", endpoint: "/api/compiler" },
   lexer: { title: "Lexical Analyzer", endpoint: "/api/lexer" },
   parser: { title: "Parse Tree Generator", endpoint: "/api/parser" },
-  semantic: { title: "Symbol Table", endpoint: "/api/semantic" },
-  intermediate: { title: "Intermediate Code", endpoint: "/api/intermediate" },
-  codegen: { title: "Code Generation", endpoint: "/api/codegen" },
 };
 
 const SAMPLE = `sadanumber x = 5;
@@ -27,7 +24,7 @@ binduwalanumber pi = 3.14;
 dikhao(pi);
 dikhao("done");`;
 
-const tabOrder = ["compiler", "lexer", "parser", "semantic", "intermediate", "codegen"];
+const tabOrder = ["compiler", "lexer", "parser"];
 const opQuery = new URLSearchParams(window.location.search).get("op");
 const opFromPath = window.location.pathname.split("/").pop();
 const opKey = (opQuery || opFromPath || "compiler").toLowerCase();
@@ -264,35 +261,7 @@ function renderParseTree(data) {
   attachTreeZoom(controls, svg, group);
 }
 
-function renderSemantic(data) {
-  clearOutput();
-  const symbols = Array.isArray(data.symbols) ? data.symbols : [];
-  const rows = symbols.map((s) => [s.name, s.type, s.scope]);
-  outputRoot.appendChild(createTable(["Name", "Type", "Scope"], rows));
 
-  const errors = Array.isArray(data.errors) ? data.errors : [];
-  if (errors.length > 0) {
-    const list = document.createElement("ul");
-    list.className = "error-list";
-    for (const err of errors) {
-      const li = document.createElement("li");
-      li.textContent = err;
-      list.appendChild(li);
-    }
-    outputRoot.appendChild(list);
-  }
-}
-
-function renderIntermediate(data) {
-  clearOutput();
-  addPreBlock(data.ir || "(none)", "IR");
-  addPreBlock(data.optimized || "(none)", "Optimized");
-}
-
-function renderCodegen(data) {
-  clearOutput();
-  addPreBlock(data.code || "(none)");
-}
 
 function renderError(msg, details) {
   clearOutput();
@@ -338,9 +307,6 @@ async function runOperation() {
     if (opKey === "compiler") renderCompiler(data);
     else if (opKey === "lexer") renderLexer(data);
     else if (opKey === "parser") renderParseTree(data);
-    else if (opKey === "semantic") renderSemantic(data);
-    else if (opKey === "intermediate") renderIntermediate(data);
-    else if (opKey === "codegen") renderCodegen(data);
   } catch (err) {
     statusText.textContent = "Failed";
     renderError(err.message || "Network error");
@@ -366,9 +332,6 @@ function registerHinglishLanguage(monaco) {
         [/[0-9]+/, "number"],
         [/"([^"\\]|\\.)*"/, "string"],
         [/\/\/.*/, "comment"],
-        [/\/\*/, "comment", "@comment"],
-        [/[{}()[\]]/, "delimiter.bracket"],
-        [/[;,.]/, "delimiter"],
         [/[+\-*\/%=<>!]+/, "operator"],
       ],
       comment: [
