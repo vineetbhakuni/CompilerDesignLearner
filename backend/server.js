@@ -3,10 +3,16 @@ const express = require("express");
 
 const {
   parseSource,
+} = require("./parser");
+const {
   lexSource,
+} = require("./lexer");
+const {
   buildParseTreeData,
+} = require("./treeDataBuilder");
+const {
   executeAst,
-} = require("./pipeline");
+} = require("./executor");
 
 const backendDir = __dirname;
 const projectRoot = path.join(backendDir, "..");
